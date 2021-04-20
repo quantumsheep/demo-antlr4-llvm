@@ -3,8 +3,6 @@
 #include <exceptions/NotImplementedException.hpp>
 #include <exceptions/VariableNotFoundException.hpp>
 
-#include <llvm/Support/Alignment.h>
-
 using namespace antlr4;
 using namespace FooLang;
 
