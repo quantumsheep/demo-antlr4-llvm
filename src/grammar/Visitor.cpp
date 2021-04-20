@@ -3,6 +3,8 @@
 #include <exceptions/NotImplementedException.hpp>
 #include <exceptions/VariableNotFoundException.hpp>
 
+#include <llvm/Support/Alignment.h>
+
 using namespace antlr4;
 using namespace FooLang;
 
@@ -16,7 +18,7 @@ llvm::Function *Visitor::printfPrototype()
     auto printf_type = llvm::FunctionType::get(llvm::Type::getVoidTy(this->llvm_context), {llvm::Type::getInt8PtrTy(this->llvm_context)}, true);
     auto func = this->module->getOrInsertFunction("printf", printf_type, llvm::AttributeList().addAttribute(this->llvm_context, 1U, llvm::Attribute::NoAlias));
 
-    return llvm::cast<llvm::Function>(func->getCallee());
+    return llvm::cast<llvm::Function>(func.getCallee());
 }
 
 void Visitor::from_file(std::string path)
