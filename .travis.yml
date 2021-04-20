@@ -5,7 +5,5 @@ os:
   - linux
 dist: bionic
 sudo: required
-before_install:
-  - sudo apt install -y openjdk-11-jdk
 script:
   - ./compile.sh
