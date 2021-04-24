@@ -1,25 +1,45 @@
+#include "CLIManager.hpp"
 #include "JIT.hpp"
+#include "ObjectEmitter.hpp"
 #include "grammar/Visitor.hpp"
 
-#include <llvm/Passes/PassBuilder.h>
 #include <llvm/Support/TargetSelect.h>
 
-#include <llvm/ExecutionEngine/ExecutionEngine.h>
-#include <llvm/ExecutionEngine/JITSymbol.h>
+int run(const FooLang::CLIManager &cli, FooLang::Visitor &visitor)
+{
+    auto jit = FooLang::JIT::create(visitor.module, visitor.llvm_context);
 
-#include <llvm/Support/TargetRegistry.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Target/TargetMachine.h>
-#include <llvm/Target/TargetOptions.h>
+    auto entry = jit->lookup<int()>("main");
+    if (!entry)
+    {
+        llvm::errs() << entry.takeError();
+        return 1;
+    }
 
-#include <llvm/ExecutionEngine/Orc/LLJIT.h>
-#include <llvm/ExecutionEngine/Orc/ThreadSafeModule.h>
+    return entry.get()();
+}
+
+int compile(const FooLang::CLIManager &cli, FooLang::Visitor &visitor)
+{
+    std::string error;
+    FooLang::ObjectEmitter::emit(visitor.module, cli.getOptionValue("-o", "output.o"), error);
+
+    if (!error.empty())
+    {
+        llvm::errs() << error;
+        return 1;
+    }
+
+    return 0;
+}
 
 int main(int argc, char **argv)
 {
-    if (argc < 2)
+    FooLang::CLIManager cli(argc, argv);
+
+    if (argc < 2 || cli.hasOption("--help") || cli.hasOption("-h"))
     {
-        std::cerr << "Usage: compiler <file> [--print-llvm]" << std::endl;
+        std::cerr << "Usage: compiler <file> [--help,-h] [--print-llvm] [--compile,-c [-o <path>]]" << std::endl;
         return 1;
     }
 
@@ -30,24 +50,22 @@ int main(int argc, char **argv)
     llvm::InitializeAllAsmPrinters();
 
     FooLang::Visitor visitor;
-    visitor.from_file(argv[1]);
+    visitor.fromFile(argv[1]);
 
-    if (argc > 2 && (argv[2] == std::string("--print-llvm")))
+    if (cli.hasOption("--print-llvm"))
     {
         visitor.module->print(llvm::outs(), nullptr);
         std::cout << std::endl;
     }
 
-    auto jit = FooLang::JIT::create(visitor.module, visitor.llvm_context);
-
-    auto entry = jit->lookup<int()>("main");
-    if (!entry)
+    if (cli.hasOption("--compile") || cli.hasOption("-c"))
     {
-        llvm::errs() << entry.takeError();
-        return 1;
+        compile(cli, visitor);
     }
-
-    entry.get()();
+    else
+    {
+        run(cli, visitor);
+    }
 
     return 0;
 }

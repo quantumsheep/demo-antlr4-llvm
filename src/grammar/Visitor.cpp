@@ -19,7 +19,7 @@ llvm::Function *Visitor::printfPrototype()
     return llvm::cast<llvm::Function>(func.getCallee());
 }
 
-void Visitor::from_file(std::string path)
+void Visitor::fromFile(std::string path)
 {
     std::ifstream stream;
     stream.open(path);

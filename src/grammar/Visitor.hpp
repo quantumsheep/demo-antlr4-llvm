@@ -24,7 +24,7 @@ public:
 
     Scope &currentScope();
 
-    void from_file(std::string path);
+    void fromFile(std::string path);
 
     llvm::Function *printfPrototype();
 
