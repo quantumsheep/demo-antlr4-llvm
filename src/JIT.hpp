@@ -16,8 +16,8 @@ private:
 public:
     JIT(std::unique_ptr<llvm::orc::LLJIT> _lljit) : lljit(std::move(_lljit)) {}
 
-    template <typename T, typename = std::enable_if_t<std::is_function<T>::value>>
-    llvm::Expected<T *> lookup(const std::string &name)
+    template <typename T, typename = std::enable_if_t<std::is_pointer<T>::value && std::is_function<std::remove_pointer_t<T>>::value>>
+    llvm::Expected<T> lookup(const std::string &name)
     {
         auto symbol = this->lljit->lookup(name);
 
@@ -26,7 +26,13 @@ public:
             return symbol.takeError();
         }
 
-        return (T *)symbol.get().getAddress();
+        return (T)symbol.get().getAddress();
+    }
+
+    template <typename T, typename = std::enable_if_t<std::is_function<T>::value>>
+    inline llvm::Expected<T *> lookup(const std::string &name)
+    {
+        return this->lookup<T *>(name);
     }
 
     static llvm::Expected<JIT> create(std::unique_ptr<llvm::Module> &module, std::unique_ptr<llvm::LLVMContext> &context)
