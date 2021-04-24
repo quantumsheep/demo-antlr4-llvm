@@ -13,13 +13,14 @@ namespace FooLang
 class Visitor
 {
 public:
-    llvm::LLVMContext llvm_context;
+    std::unique_ptr<llvm::LLVMContext> llvm_context;
     llvm::IRBuilder<> builder;
     std::unique_ptr<llvm::Module> module;
     std::stack<Scope> scopes;
 
-    Visitor() : builder(this->llvm_context),
-                module(std::make_unique<llvm::Module>("output", this->llvm_context)) {}
+    Visitor() : llvm_context(std::make_unique<llvm::LLVMContext>()),
+                builder(*this->llvm_context),
+                module(std::make_unique<llvm::Module>("output", *this->llvm_context)) {}
 
     Scope &currentScope();
 

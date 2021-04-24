@@ -1,4 +1,4 @@
-#include "KaleidoscopeJIT.hpp"
+#include "JIT.hpp"
 #include "grammar/Visitor.hpp"
 
 #include <llvm/Passes/PassBuilder.h>
@@ -6,6 +6,14 @@
 
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/JITSymbol.h>
+
+#include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Target/TargetMachine.h>
+#include <llvm/Target/TargetOptions.h>
+
+#include <llvm/ExecutionEngine/Orc/LLJIT.h>
+#include <llvm/ExecutionEngine/Orc/ThreadSafeModule.h>
 
 int main(int argc, char **argv)
 {
@@ -30,11 +38,16 @@ int main(int argc, char **argv)
         std::cout << std::endl;
     }
 
-    llvm::orc::KaleidoscopeJIT J;
-    J.addModule(std::move(visitor.module));
-    auto *Main = (int (*)())(intptr_t)llvm::cantFail(J.findSymbolNoMangle("main").getAddress());
+    auto jit = FooLang::JIT::create(visitor.module, visitor.llvm_context);
 
-    Main();
+    auto entry = jit->lookup<int()>("main");
+    if (!entry)
+    {
+        llvm::errs() << entry.takeError();
+        return 1;
+    }
+
+    entry.get()();
 
     return 0;
 }

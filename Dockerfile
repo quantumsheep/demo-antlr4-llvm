@@ -20,7 +20,7 @@ RUN set -xe && \
 RUN set -xe && \
     wget https://apt.llvm.org/llvm.sh && \
     chmod +x llvm.sh && \
-    ./llvm.sh 11
+    ./llvm.sh 12
 
 RUN set -xe && \
     git config --global user.email "johndoe@example.com" && \

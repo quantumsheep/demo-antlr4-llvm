@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7 FATAL_ERROR)
 project(compiler)
 
-find_package(LLVM 11.1 REQUIRED CONFIG)
+find_package(LLVM 12 REQUIRED CONFIG)
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
@@ -182,7 +182,7 @@ set(TARGET_WebAssembly WebAssemblyCodeGen WebAssemblyAsmParser WebAssemblyDesc W
 set(TARGET_XCore XCoreCodeGen XCoreDesc XCoreInfo)
 set(TARGET_SystemZ SystemZCodeGen SystemZAsmParser SystemZDesc SystemZInfo) 
 set(TARGET_Sparc SparcCodeGen SparcAsmParser SparcDesc SparcInfo) 
-set(TARGET_RISCV RISCVCodeGen RISCVAsmParser RISCVDesc RISCVUtils RISCVInfo) 
+set(TARGET_RISCV RISCVCodeGen RISCVAsmParser RISCVDesc RISCVInfo) 
 set(TARGET_PowerPC PowerPCCodeGen PowerPCAsmParser PowerPCDesc PowerPCInfo) 
 set(TARGET_NVPTX NVPTXCodeGen NVPTXDesc NVPTXInfo) 
 set(TARGET_MSP430 MSP430CodeGen MSP430AsmParser MSP430Desc MSP430Info) 
