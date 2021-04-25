@@ -239,6 +239,10 @@ llvm::Value *Visitor::visitExpression(FooParser::ExpressionContext *context)
     {
         return this->visitBinaryMultiplyOperation(binaryMultiplyOperationContext);
     }
+    else if (auto binaryConditionalOperationContext = dynamic_cast<FooParser::BinaryConditionalOperationContext *>(context))
+    {
+        return this->visitBinaryConditionalOperation(binaryConditionalOperationContext);
+    }
     else if (auto variableAffectationContext = dynamic_cast<FooParser::VariableAffectationContext *>(context))
     {
         return this->visitVariableAffectation(variableAffectationContext);
@@ -311,6 +315,39 @@ llvm::Value *Visitor::visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOper
     else if (context->Mod())
     {
         return builder.CreateSRem(leftExpression, rightExpression);
+    }
+
+    throw NotImplementedException();
+}
+
+llvm::Value *Visitor::visitBinaryConditionalOperation(FooParser::BinaryConditionalOperationContext *context)
+{
+    auto leftExpression = this->visitExpression(context->expression(0));
+    auto rightExpression = this->visitExpression(context->expression(1));
+
+    if (context->Gt())
+    {
+        return builder.CreateICmpSGT(leftExpression, rightExpression);
+    }
+    else if (context->Gte())
+    {
+        return builder.CreateICmpSGE(leftExpression, rightExpression);
+    }
+    else if (context->Lt())
+    {
+        return builder.CreateICmpSLT(leftExpression, rightExpression);
+    }
+    else if (context->Lte())
+    {
+        return builder.CreateICmpSLE(leftExpression, rightExpression);
+    }
+    else if (context->Eq())
+    {
+        return builder.CreateICmpEQ(leftExpression, rightExpression);
+    }
+    else if (context->Ne())
+    {
+        return builder.CreateICmpNE(leftExpression, rightExpression);
     }
 
     throw NotImplementedException();

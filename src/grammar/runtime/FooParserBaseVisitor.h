@@ -51,6 +51,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitBinaryConditionalOperation(FooParser::BinaryConditionalOperationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitVariableAffectation(FooParser::VariableAffectationContext *ctx) override {
     return visitChildren(ctx);
   }

@@ -12,12 +12,13 @@
 class  FooParser : public antlr4::Parser {
 public:
   enum {
-    Add = 1, Sub = 2, Mul = 3, Div = 4, Mod = 5, Equal = 6, OpeningParen = 7, 
-    ClosingParen = 8, OpeningBrace = 9, ClosingBrace = 10, OpeningBracket = 11, 
-    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, If = 15, While = 16, 
-    Comma = 17, InstructionsSeparator = 18, VariableName = 19, StringLiteral = 20, 
-    CharLiteral = 21, DecimalLiteral = 22, ZeroLiteral = 23, HexadecimalLiteral = 24, 
-    BinaryLiteral = 25, Comment = 26, WhiteSpace = 27, LineTerminator = 28
+    Add = 1, Sub = 2, Mul = 3, Div = 4, Mod = 5, Gt = 6, Gte = 7, Lt = 8, 
+    Lte = 9, Eq = 10, Ne = 11, Equal = 12, OpeningParen = 13, ClosingParen = 14, 
+    OpeningBrace = 15, ClosingBrace = 16, OpeningBracket = 17, ClosingBracket = 18, 
+    VariableDeclarator = 19, Print = 20, If = 21, While = 22, Comma = 23, 
+    InstructionsSeparator = 24, VariableName = 25, StringLiteral = 26, CharLiteral = 27, 
+    DecimalLiteral = 28, ZeroLiteral = 29, HexadecimalLiteral = 30, BinaryLiteral = 31, 
+    Comment = 32, WhiteSpace = 33, LineTerminator = 34
   };
 
   enum {
@@ -173,6 +174,22 @@ public:
     antlr4::tree::TerminalNode *Mul();
     antlr4::tree::TerminalNode *Div();
     antlr4::tree::TerminalNode *Mod();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  BinaryConditionalOperationContext : public ExpressionContext {
+  public:
+    BinaryConditionalOperationContext(ExpressionContext *ctx);
+
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    antlr4::tree::TerminalNode *Gt();
+    antlr4::tree::TerminalNode *Gte();
+    antlr4::tree::TerminalNode *Lt();
+    antlr4::tree::TerminalNode *Lte();
+    antlr4::tree::TerminalNode *Eq();
+    antlr4::tree::TerminalNode *Ne();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

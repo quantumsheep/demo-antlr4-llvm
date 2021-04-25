@@ -62,6 +62,8 @@ public:
 
     llvm::Value *visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context);
 
+    llvm::Value *visitBinaryConditionalOperation(FooParser::BinaryConditionalOperationContext *context);
+
     llvm::Value *visitVariableAffectation(FooParser::VariableAffectationContext *context);
 
     llvm::Value *visitLiteral(FooParser::LiteralContext *context);
