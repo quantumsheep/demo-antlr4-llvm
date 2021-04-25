@@ -65,10 +65,10 @@ public:
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
-    ExpressionContext *expression();
-    antlr4::tree::TerminalNode *InstructionsSeparator();
     VariableDeclarationContext *variableDeclaration();
+    antlr4::tree::TerminalNode *InstructionsSeparator();
     PrintStatementContext *printStatement();
+    ExpressionContext *expression();
 
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -150,6 +150,17 @@ public:
     antlr4::tree::TerminalNode *Mul();
     antlr4::tree::TerminalNode *Div();
     antlr4::tree::TerminalNode *Mod();
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  VariableAffectationContext : public ExpressionContext {
+  public:
+    VariableAffectationContext(ExpressionContext *ctx);
+
+    antlr4::tree::TerminalNode *VariableName();
+    antlr4::tree::TerminalNode *Equal();
+    ExpressionContext *expression();
 
     virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

@@ -46,6 +46,8 @@ public:
 
     llvm::Value *visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context);
 
+    llvm::Value *visitVariableAffectation(FooParser::VariableAffectationContext *context);
+
     llvm::Value *visitLiteral(FooParser::LiteralContext *context);
 
     llvm::Value *visitIntegerLiteral(FooParser::IntegerLiteralContext *context);

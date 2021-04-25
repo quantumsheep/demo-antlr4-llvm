@@ -67,6 +67,10 @@ void Visitor::visitStatement(FooParser::StatementContext *context)
     {
         this->visitPrintStatement(printStatementContext);
     }
+    else if (auto expressionContext = context->expression())
+    {
+        this->visitExpression(expressionContext);
+    }
     else
     {
         throw NotImplementedException();
@@ -107,6 +111,10 @@ llvm::Value *Visitor::visitExpression(FooParser::ExpressionContext *context)
     else if (auto binaryMultiplyOperationContext = dynamic_cast<FooParser::BinaryMultiplyOperationContext *>(context))
     {
         return this->visitBinaryMultiplyOperation(binaryMultiplyOperationContext);
+    }
+    else if (auto variableAffectationContext = dynamic_cast<FooParser::VariableAffectationContext *>(context))
+    {
+        return this->visitVariableAffectation(variableAffectationContext);
     }
     else if (auto literalContext = dynamic_cast<FooParser::LiteralExpressionContext *>(context))
     {
@@ -180,6 +188,22 @@ llvm::Value *Visitor::visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOper
     }
 
     throw NotImplementedException();
+}
+
+llvm::Value *Visitor::visitVariableAffectation(FooParser::VariableAffectationContext *context)
+{
+    auto name = context->VariableName()->toString();
+    auto variable = this->currentScope().getVariable(name);
+
+    if (!variable)
+    {
+        throw VariableNotFoundException(name);
+    }
+
+    auto expression = this->visitExpression(context->expression());
+    this->builder.CreateStore(expression, variable);
+
+    return this->builder.CreateLoad(variable->getType()->getPointerElementType(), variable);
 }
 
 llvm::Value *Visitor::visitLiteral(FooParser::LiteralContext *context)

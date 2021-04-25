@@ -7,17 +7,18 @@ options {
 instructions: statement* eos;
 
 statement:
-	expression InstructionsSeparator
-	| variableDeclaration InstructionsSeparator
-	| printStatement InstructionsSeparator;
+	variableDeclaration InstructionsSeparator
+	| printStatement InstructionsSeparator
+	| expression InstructionsSeparator;
 
 expression:
-	'(' expression ')'							# InParenExpression
-	| '-' expression							# UnaryNegativeExpression
-	| VariableName								# NameExpression
-	| expression (Mul | Div | Mod) expression	# BinaryMultiplyOperation
-	| expression (Add | Sub) expression			# BinaryOperation
-	| literal									# LiteralExpression;
+	'(' expression ')'								# InParenExpression
+	| '-' expression								# UnaryNegativeExpression
+	| VariableName									# NameExpression
+	| expression (Mul | Div | Mod) expression		# BinaryMultiplyOperation
+	| expression (Add | Sub) expression				# BinaryOperation
+	| <assoc = right> VariableName '=' expression	# VariableAffectation
+	| literal										# LiteralExpression;
 
 literal: integerLiteral;
 

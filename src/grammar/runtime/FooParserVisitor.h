@@ -35,6 +35,8 @@ public:
 
     virtual antlrcpp::Any visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context) = 0;
 
+    virtual antlrcpp::Any visitVariableAffectation(FooParser::VariableAffectationContext *context) = 0;
+
     virtual antlrcpp::Any visitLiteral(FooParser::LiteralContext *context) = 0;
 
     virtual antlrcpp::Any visitIntegerLiteral(FooParser::IntegerLiteralContext *context) = 0;

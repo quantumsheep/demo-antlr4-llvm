@@ -47,6 +47,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitVariableAffectation(FooParser::VariableAffectationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitLiteral(FooParser::LiteralContext *ctx) override {
     return visitChildren(ctx);
   }
