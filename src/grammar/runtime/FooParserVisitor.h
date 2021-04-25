@@ -23,13 +23,17 @@ public:
 
     virtual antlrcpp::Any visitStatement(FooParser::StatementContext *context) = 0;
 
+    virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *context) = 0;
+
     virtual antlrcpp::Any visitInParenExpression(FooParser::InParenExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *context) = 0;
+    virtual antlrcpp::Any visitBinaryOperation(FooParser::BinaryOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitNameExpression(FooParser::NameExpressionContext *context) = 0;
 
     virtual antlrcpp::Any visitLiteralExpression(FooParser::LiteralExpressionContext *context) = 0;
+
+    virtual antlrcpp::Any visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context) = 0;
 
     virtual antlrcpp::Any visitLiteral(FooParser::LiteralContext *context) = 0;
 

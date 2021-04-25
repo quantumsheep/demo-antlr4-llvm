@@ -23,11 +23,15 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitInParenExpression(FooParser::InParenExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *ctx) override {
+  virtual antlrcpp::Any visitBinaryOperation(FooParser::BinaryOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -36,6 +40,10 @@ public:
   }
 
   virtual antlrcpp::Any visitLiteralExpression(FooParser::LiteralExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *ctx) override {
     return visitChildren(ctx);
   }
 

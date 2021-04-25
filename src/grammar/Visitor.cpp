@@ -90,7 +90,7 @@ llvm::Value *Visitor::visitExpression(FooParser::ExpressionContext *context)
 {
     if (auto inParenExpressionContext = dynamic_cast<FooParser::InParenExpressionContext *>(context))
     {
-        return this->visitExpression(inParenExpressionContext);
+        return this->visitExpression(inParenExpressionContext->expression());
     }
     else if (auto unaryNegativeExpressionContext = dynamic_cast<FooParser::UnaryNegativeExpressionContext *>(context))
     {
@@ -99,6 +99,14 @@ llvm::Value *Visitor::visitExpression(FooParser::ExpressionContext *context)
     else if (auto nameExpressionContext = dynamic_cast<FooParser::NameExpressionContext *>(context))
     {
         return this->visitNameExpression(nameExpressionContext);
+    }
+    else if (auto binaryOperationContext = dynamic_cast<FooParser::BinaryOperationContext *>(context))
+    {
+        return this->visitBinaryOperation(binaryOperationContext);
+    }
+    else if (auto binaryMultiplyOperationContext = dynamic_cast<FooParser::BinaryMultiplyOperationContext *>(context))
+    {
+        return this->visitBinaryMultiplyOperation(binaryMultiplyOperationContext);
     }
     else if (auto literalContext = dynamic_cast<FooParser::LiteralExpressionContext *>(context))
     {
@@ -134,6 +142,44 @@ llvm::Value *Visitor::visitNameExpression(FooParser::NameExpressionContext *cont
     }
 
     return this->builder.CreateLoad(variable->getType()->getPointerElementType(), variable);
+}
+
+llvm::Value *Visitor::visitBinaryOperation(FooParser::BinaryOperationContext *context)
+{
+    auto leftExpression = this->visitExpression(context->expression(0));
+    auto rightExpression = this->visitExpression(context->expression(1));
+
+    if (context->Add())
+    {
+        return builder.CreateAdd(leftExpression, rightExpression);
+    }
+    else if (context->Sub())
+    {
+        return builder.CreateSub(leftExpression, rightExpression);
+    }
+
+    throw NotImplementedException();
+}
+
+llvm::Value *Visitor::visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context)
+{
+    auto leftExpression = this->visitExpression(context->expression(0));
+    auto rightExpression = this->visitExpression(context->expression(1));
+
+    if (context->Mul())
+    {
+        return builder.CreateMul(leftExpression, rightExpression);
+    }
+    else if (context->Div())
+    {
+        return builder.CreateSDiv(leftExpression, rightExpression);
+    }
+    else if (context->Mod())
+    {
+        return builder.CreateSRem(leftExpression, rightExpression);
+    }
+
+    throw NotImplementedException();
 }
 
 llvm::Value *Visitor::visitLiteral(FooParser::LiteralContext *context)

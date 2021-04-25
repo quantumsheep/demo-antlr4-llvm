@@ -42,6 +42,10 @@ public:
 
     llvm::Value *visitNameExpression(FooParser::NameExpressionContext *context);
 
+    llvm::Value *visitBinaryOperation(FooParser::BinaryOperationContext *context);
+
+    llvm::Value *visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context);
+
     llvm::Value *visitLiteral(FooParser::LiteralContext *context);
 
     llvm::Value *visitIntegerLiteral(FooParser::IntegerLiteralContext *context);

@@ -12,10 +12,12 @@ statement:
 	| printStatement InstructionsSeparator;
 
 expression:
-	'(' expression ')'	# InParenExpression
-	| '-' expression	# UnaryNegativeExpression
-	| VariableName		# NameExpression
-	| literal			# LiteralExpression;
+	'(' expression ')'							# InParenExpression
+	| '-' expression							# UnaryNegativeExpression
+	| VariableName								# NameExpression
+	| expression (Mul | Div | Mod) expression	# BinaryMultiplyOperation
+	| expression (Add | Sub) expression			# BinaryOperation
+	| literal									# LiteralExpression;
 
 literal: integerLiteral;
 
