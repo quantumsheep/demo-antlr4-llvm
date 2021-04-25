@@ -14,16 +14,17 @@ public:
   enum {
     Add = 1, Sub = 2, Mul = 3, Div = 4, Mod = 5, Equal = 6, OpeningParen = 7, 
     ClosingParen = 8, OpeningBrace = 9, ClosingBrace = 10, OpeningBracket = 11, 
-    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, If = 15, Comma = 16, 
-    InstructionsSeparator = 17, VariableName = 18, StringLiteral = 19, CharLiteral = 20, 
-    DecimalLiteral = 21, ZeroLiteral = 22, HexadecimalLiteral = 23, BinaryLiteral = 24, 
-    Comment = 25, WhiteSpace = 26, LineTerminator = 27
+    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, If = 15, While = 16, 
+    Comma = 17, InstructionsSeparator = 18, VariableName = 19, StringLiteral = 20, 
+    CharLiteral = 21, DecimalLiteral = 22, ZeroLiteral = 23, HexadecimalLiteral = 24, 
+    BinaryLiteral = 25, Comment = 26, WhiteSpace = 27, LineTerminator = 28
   };
 
   enum {
     RuleInstructions = 0, RuleBody = 1, RuleStatement = 2, RuleExpression = 3, 
     RuleLiteral = 4, RuleIntegerLiteral = 5, RuleVariableDeclaration = 6, 
-    RulePrintStatement = 7, RuleType = 8, RuleIfStatement = 9, RuleEos = 10
+    RulePrintStatement = 7, RuleType = 8, RuleIfStatement = 9, RuleWhileStatement = 10, 
+    RuleEos = 11
   };
 
   explicit FooParser(antlr4::TokenStream *input);
@@ -46,6 +47,7 @@ public:
   class PrintStatementContext;
   class TypeContext;
   class IfStatementContext;
+  class WhileStatementContext;
   class EosContext; 
 
   class  InstructionsContext : public antlr4::ParserRuleContext {
@@ -87,6 +89,7 @@ public:
     antlr4::tree::TerminalNode *InstructionsSeparator();
     BodyContext *body();
     IfStatementContext *ifStatement();
+    WhileStatementContext *whileStatement();
     PrintStatementContext *printStatement();
     ExpressionContext *expression();
 
@@ -278,6 +281,21 @@ public:
   };
 
   IfStatementContext* ifStatement();
+
+  class  WhileStatementContext : public antlr4::ParserRuleContext {
+  public:
+    WhileStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *While();
+    ExpressionContext *expression();
+    BodyContext *body();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  WhileStatementContext* whileStatement();
 
   class  EosContext : public antlr4::ParserRuleContext {
   public:

@@ -38,7 +38,7 @@ public:
         llvm::BasicBlock *afterBlock = nullptr;
     };
 
-    Body visitBody(FooParser::BodyContext *context);
+    Body visitBody(FooParser::BodyContext *context, llvm::BasicBlock *afterBlock = nullptr);
 
     void visitStatements(const std::vector<FooParser::StatementContext *> &statementContexts);
 
@@ -47,6 +47,8 @@ public:
     void visitVariableDeclaration(FooParser::VariableDeclarationContext *context);
 
     void visitIfStatement(FooParser::IfStatementContext *context);
+
+    void visitWhileStatement(FooParser::WhileStatementContext *context);
 
     void visitPrintStatement(FooParser::PrintStatementContext *context);
 

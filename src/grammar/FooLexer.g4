@@ -25,6 +25,7 @@ Print: 'print';
 
 // Statements
 If: 'if';
+While: 'while';
 
 // Others
 Comma: ',';

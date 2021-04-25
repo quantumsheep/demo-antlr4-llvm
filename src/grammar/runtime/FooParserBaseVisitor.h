@@ -79,6 +79,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitWhileStatement(FooParser::WhileStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitEos(FooParser::EosContext *ctx) override {
     return visitChildren(ctx);
   }

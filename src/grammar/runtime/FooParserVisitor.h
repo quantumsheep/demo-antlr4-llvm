@@ -51,6 +51,8 @@ public:
 
     virtual antlrcpp::Any visitIfStatement(FooParser::IfStatementContext *context) = 0;
 
+    virtual antlrcpp::Any visitWhileStatement(FooParser::WhileStatementContext *context) = 0;
+
     virtual antlrcpp::Any visitEos(FooParser::EosContext *context) = 0;
 
 

@@ -64,11 +64,11 @@ void Visitor::visitInstructions(FooParser::InstructionsContext *context)
     this->builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*this->llvm_context), 0, true));
 }
 
-Visitor::Body Visitor::visitBody(FooParser::BodyContext *context)
+Visitor::Body Visitor::visitBody(FooParser::BodyContext *context, llvm::BasicBlock *afterBlock)
 {
     auto block = llvm::BasicBlock::Create(builder.getContext());
-    this->builder.SetInsertPoint(block);
 
+    this->builder.SetInsertPoint(block);
     block->insertInto(this->currentScope().currentFunction);
 
     this->scopes.push_back(Scope(this->currentScope().currentFunction));
@@ -77,11 +77,20 @@ Visitor::Body Visitor::visitBody(FooParser::BodyContext *context)
 
     this->scopes.pop_back();
 
-    auto afterBlock = llvm::BasicBlock::Create(builder.getContext());
+    auto externalAfterBlock = afterBlock;
+
+    if (!externalAfterBlock)
+    {
+        afterBlock = llvm::BasicBlock::Create(builder.getContext());
+    }
+
     this->builder.CreateBr(afterBlock);
 
-    this->builder.SetInsertPoint(afterBlock);
-    afterBlock->insertInto(this->currentScope().currentFunction);
+    if (!externalAfterBlock)
+    {
+        this->builder.SetInsertPoint(afterBlock);
+        afterBlock->insertInto(this->currentScope().currentFunction);
+    }
 
     return Body{
         .mainBlock = block,
@@ -117,6 +126,10 @@ void Visitor::visitStatement(FooParser::StatementContext *context)
     else if (auto ifStatementContext = context->ifStatement())
     {
         this->visitIfStatement(ifStatementContext);
+    }
+    else if (auto whileStatementContext = context->whileStatement())
+    {
+        this->visitWhileStatement(whileStatementContext);
     }
     else if (auto printStatementContext = context->printStatement())
     {
@@ -169,6 +182,39 @@ void Visitor::visitIfStatement(FooParser::IfStatementContext *context)
     }
 
     builder.SetInsertPoint(body.afterBlock);
+}
+
+void Visitor::visitWhileStatement(FooParser::WhileStatementContext *context)
+{
+    auto conditionBlock = llvm::BasicBlock::Create(builder.getContext());
+    builder.CreateBr(conditionBlock);
+
+    builder.SetInsertPoint(conditionBlock);
+    conditionBlock->insertInto(this->currentScope().currentFunction);
+
+    auto expression = this->visitExpression(context->expression());
+    auto type = expression->getType();
+
+    auto body = this->visitBody(context->body(), conditionBlock);
+
+    auto afterBlock = llvm::BasicBlock::Create(builder.getContext());
+
+    if (type->isIntegerTy())
+    {
+        builder.SetInsertPoint(conditionBlock);
+
+        auto zero = llvm::ConstantInt::get(type, 0);
+        auto condition = builder.CreateICmpNE(expression, zero);
+
+        builder.CreateCondBr(condition, body.mainBlock, afterBlock);
+    }
+    else
+    {
+        throw NotImplementedException();
+    }
+
+    builder.SetInsertPoint(afterBlock);
+    afterBlock->insertInto(this->currentScope().currentFunction);
 }
 
 llvm::Value *Visitor::visitExpression(FooParser::ExpressionContext *context)

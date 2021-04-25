@@ -14,10 +14,10 @@ public:
   enum {
     Add = 1, Sub = 2, Mul = 3, Div = 4, Mod = 5, Equal = 6, OpeningParen = 7, 
     ClosingParen = 8, OpeningBrace = 9, ClosingBrace = 10, OpeningBracket = 11, 
-    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, If = 15, Comma = 16, 
-    InstructionsSeparator = 17, VariableName = 18, StringLiteral = 19, CharLiteral = 20, 
-    DecimalLiteral = 21, ZeroLiteral = 22, HexadecimalLiteral = 23, BinaryLiteral = 24, 
-    Comment = 25, WhiteSpace = 26, LineTerminator = 27
+    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, If = 15, While = 16, 
+    Comma = 17, InstructionsSeparator = 18, VariableName = 19, StringLiteral = 20, 
+    CharLiteral = 21, DecimalLiteral = 22, ZeroLiteral = 23, HexadecimalLiteral = 24, 
+    BinaryLiteral = 25, Comment = 26, WhiteSpace = 27, LineTerminator = 28
   };
 
   explicit FooLexer(antlr4::CharStream *input);

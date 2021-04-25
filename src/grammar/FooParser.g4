@@ -12,6 +12,7 @@ statement:
 	variableDeclaration InstructionsSeparator
 	| body
 	| ifStatement
+	| whileStatement
 	| printStatement InstructionsSeparator
 	| expression InstructionsSeparator;
 
@@ -42,5 +43,7 @@ printStatement: Print '(' expression (',' expression)* ')';
 type: VariableName;
 
 ifStatement: 'if' expression body;
+
+whileStatement: 'while' expression body;
 
 eos: (EOF | LineTerminator);
