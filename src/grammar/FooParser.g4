@@ -6,8 +6,12 @@ options {
 
 instructions: statement* eos;
 
+body: '{' statement* '}';
+
 statement:
 	variableDeclaration InstructionsSeparator
+	| body
+	| ifStatement
 	| printStatement InstructionsSeparator
 	| expression InstructionsSeparator;
 
@@ -36,5 +40,7 @@ variableDeclaration:
 printStatement: Print '(' expression (',' expression)* ')';
 
 type: VariableName;
+
+ifStatement: 'if' expression body;
 
 eos: (EOF | LineTerminator);

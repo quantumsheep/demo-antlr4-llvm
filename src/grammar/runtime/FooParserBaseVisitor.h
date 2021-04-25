@@ -19,6 +19,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual antlrcpp::Any visitBody(FooParser::BodyContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual antlrcpp::Any visitStatement(FooParser::StatementContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -68,6 +72,10 @@ public:
   }
 
   virtual antlrcpp::Any visitType(FooParser::TypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual antlrcpp::Any visitIfStatement(FooParser::IfStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -21,6 +21,8 @@ public:
    */
     virtual antlrcpp::Any visitInstructions(FooParser::InstructionsContext *context) = 0;
 
+    virtual antlrcpp::Any visitBody(FooParser::BodyContext *context) = 0;
+
     virtual antlrcpp::Any visitStatement(FooParser::StatementContext *context) = 0;
 
     virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *context) = 0;
@@ -46,6 +48,8 @@ public:
     virtual antlrcpp::Any visitPrintStatement(FooParser::PrintStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitType(FooParser::TypeContext *context) = 0;
+
+    virtual antlrcpp::Any visitIfStatement(FooParser::IfStatementContext *context) = 0;
 
     virtual antlrcpp::Any visitEos(FooParser::EosContext *context) = 0;
 

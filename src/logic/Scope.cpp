@@ -2,13 +2,13 @@
 
 using namespace FooLang;
 
-llvm::Value *Scope::setVariable(std::string name, llvm::Value *value)
+llvm::Value *Scope::setVariable(const std::string &name, llvm::Value *value)
 {
     this->variables[name] = value;
     return value;
 }
 
-llvm::Value *Scope::getVariable(std::string name)
+llvm::Value *Scope::getVariable(const std::string &name)
 {
     try
     {

@@ -9,8 +9,12 @@ class Scope
 public:
     std::unordered_map<std::string, llvm::Value *> variables;
 
-    llvm::Value *setVariable(std::string name, llvm::Value *);
+    llvm::Function *currentFunction = nullptr;
 
-    llvm::Value *getVariable(std::string name);
+    Scope(llvm::Function *_currentFunction = nullptr) : currentFunction(_currentFunction) {}
+
+    llvm::Value *setVariable(const std::string &name, llvm::Value *);
+
+    llvm::Value *getVariable(const std::string &name);
 };
 } // namespace FooLang

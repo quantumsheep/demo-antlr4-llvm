@@ -23,6 +23,9 @@ VariableDeclarator: 'let';
 // Print
 Print: 'print';
 
+// Statements
+If: 'if';
+
 // Others
 Comma: ',';
 

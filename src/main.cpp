@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
     if (argc < 2 || cli.hasOption("--help") || cli.hasOption("-h"))
     {
-        std::cerr << "Usage: compiler <file> [--help,-h] [--print-llvm] [--compile,-c [-o <path>]]" << std::endl;
+        std::cerr << "Usage: compiler <file> [--help,-h] [--print-llvm] [--compile,-c [-o <path (default: output.o)>]]" << std::endl;
         return 1;
     }
 

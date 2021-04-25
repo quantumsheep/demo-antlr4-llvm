@@ -14,16 +14,16 @@ public:
   enum {
     Add = 1, Sub = 2, Mul = 3, Div = 4, Mod = 5, Equal = 6, OpeningParen = 7, 
     ClosingParen = 8, OpeningBrace = 9, ClosingBrace = 10, OpeningBracket = 11, 
-    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, Comma = 15, 
-    InstructionsSeparator = 16, VariableName = 17, StringLiteral = 18, CharLiteral = 19, 
-    DecimalLiteral = 20, ZeroLiteral = 21, HexadecimalLiteral = 22, BinaryLiteral = 23, 
-    Comment = 24, WhiteSpace = 25, LineTerminator = 26
+    ClosingBracket = 12, VariableDeclarator = 13, Print = 14, If = 15, Comma = 16, 
+    InstructionsSeparator = 17, VariableName = 18, StringLiteral = 19, CharLiteral = 20, 
+    DecimalLiteral = 21, ZeroLiteral = 22, HexadecimalLiteral = 23, BinaryLiteral = 24, 
+    Comment = 25, WhiteSpace = 26, LineTerminator = 27
   };
 
   enum {
-    RuleInstructions = 0, RuleStatement = 1, RuleExpression = 2, RuleLiteral = 3, 
-    RuleIntegerLiteral = 4, RuleVariableDeclaration = 5, RulePrintStatement = 6, 
-    RuleType = 7, RuleEos = 8
+    RuleInstructions = 0, RuleBody = 1, RuleStatement = 2, RuleExpression = 3, 
+    RuleLiteral = 4, RuleIntegerLiteral = 5, RuleVariableDeclaration = 6, 
+    RulePrintStatement = 7, RuleType = 8, RuleIfStatement = 9, RuleEos = 10
   };
 
   explicit FooParser(antlr4::TokenStream *input);
@@ -37,6 +37,7 @@ public:
 
 
   class InstructionsContext;
+  class BodyContext;
   class StatementContext;
   class ExpressionContext;
   class LiteralContext;
@@ -44,6 +45,7 @@ public:
   class VariableDeclarationContext;
   class PrintStatementContext;
   class TypeContext;
+  class IfStatementContext;
   class EosContext; 
 
   class  InstructionsContext : public antlr4::ParserRuleContext {
@@ -61,12 +63,30 @@ public:
 
   InstructionsContext* instructions();
 
+  class  BodyContext : public antlr4::ParserRuleContext {
+  public:
+    BodyContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *OpeningBrace();
+    antlr4::tree::TerminalNode *ClosingBrace();
+    std::vector<StatementContext *> statement();
+    StatementContext* statement(size_t i);
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  BodyContext* body();
+
   class  StatementContext : public antlr4::ParserRuleContext {
   public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     VariableDeclarationContext *variableDeclaration();
     antlr4::tree::TerminalNode *InstructionsSeparator();
+    BodyContext *body();
+    IfStatementContext *ifStatement();
     PrintStatementContext *printStatement();
     ExpressionContext *expression();
 
@@ -243,6 +263,21 @@ public:
   };
 
   TypeContext* type();
+
+  class  IfStatementContext : public antlr4::ParserRuleContext {
+  public:
+    IfStatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *If();
+    ExpressionContext *expression();
+    BodyContext *body();
+
+
+    virtual antlrcpp::Any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  IfStatementContext* ifStatement();
 
   class  EosContext : public antlr4::ParserRuleContext {
   public:

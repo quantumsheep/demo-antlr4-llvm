@@ -8,7 +8,22 @@ using namespace FooLang;
 
 Scope &Visitor::currentScope()
 {
-    return this->scopes.top();
+    return this->scopes.back();
+}
+
+llvm::Value *Visitor::getVariable(const std::string &name)
+{
+    for (auto it = this->scopes.rbegin(); it != this->scopes.rend(); it++)
+    {
+        auto variable = it->getVariable(name);
+
+        if (variable)
+        {
+            return variable;
+        }
+    }
+
+    return nullptr;
 }
 
 llvm::Function *Visitor::printfPrototype()
@@ -19,7 +34,7 @@ llvm::Function *Visitor::printfPrototype()
     return llvm::cast<llvm::Function>(func.getCallee());
 }
 
-void Visitor::fromFile(std::string path)
+void Visitor::fromFile(const std::string &path)
 {
     std::ifstream stream;
     stream.open(path);
@@ -28,8 +43,6 @@ void Visitor::fromFile(std::string path)
     auto lexer = new FooLexer(input);
     auto tokens = new CommonTokenStream(lexer);
     auto parser = new FooParser(tokens);
-
-    this->scopes.push(Scope());
 
     FooParser::InstructionsContext *context = parser->instructions();
     this->visitInstructions(context);
@@ -41,12 +54,39 @@ void Visitor::visitInstructions(FooParser::InstructionsContext *context)
     auto function = llvm::Function::Create(functionType, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "main", this->module.get());
     auto block = llvm::BasicBlock::Create(builder.getContext());
 
+    this->scopes.push_back(Scope(function));
+
     block->insertInto(function);
     this->builder.SetInsertPoint(block);
 
     this->visitStatements(context->statement());
 
     this->builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*this->llvm_context), 0, true));
+}
+
+Visitor::Body Visitor::visitBody(FooParser::BodyContext *context)
+{
+    auto block = llvm::BasicBlock::Create(builder.getContext());
+    this->builder.SetInsertPoint(block);
+
+    block->insertInto(this->currentScope().currentFunction);
+
+    this->scopes.push_back(Scope(this->currentScope().currentFunction));
+
+    this->visitStatements(context->statement());
+
+    this->scopes.pop_back();
+
+    auto afterBlock = llvm::BasicBlock::Create(builder.getContext());
+    this->builder.CreateBr(afterBlock);
+
+    this->builder.SetInsertPoint(afterBlock);
+    afterBlock->insertInto(this->currentScope().currentFunction);
+
+    return Body{
+        .mainBlock = block,
+        .afterBlock = afterBlock,
+    };
 }
 
 void Visitor::visitStatements(const std::vector<FooParser::StatementContext *> &statementContexts)
@@ -62,6 +102,21 @@ void Visitor::visitStatement(FooParser::StatementContext *context)
     if (auto variableDeclarationContext = context->variableDeclaration())
     {
         this->visitVariableDeclaration(variableDeclarationContext);
+    }
+    else if (auto bodyContext = context->body())
+    {
+        auto previousBlock = builder.GetInsertBlock();
+
+        auto body = this->visitBody(bodyContext);
+
+        builder.SetInsertPoint(previousBlock);
+        builder.CreateBr(body.mainBlock);
+
+        builder.SetInsertPoint(body.afterBlock);
+    }
+    else if (auto ifStatementContext = context->ifStatement())
+    {
+        this->visitIfStatement(ifStatementContext);
     }
     else if (auto printStatementContext = context->printStatement())
     {
@@ -88,6 +143,32 @@ void Visitor::visitVariableDeclaration(FooParser::VariableDeclarationContext *co
     builder.CreateStore(expression, alloca);
 
     this->currentScope().setVariable(name, alloca);
+}
+
+void Visitor::visitIfStatement(FooParser::IfStatementContext *context)
+{
+    auto expression = this->visitExpression(context->expression());
+    auto type = expression->getType();
+
+    auto previousBlock = builder.GetInsertBlock();
+
+    auto body = this->visitBody(context->body());
+
+    if (type->isIntegerTy())
+    {
+        builder.SetInsertPoint(previousBlock);
+
+        auto zero = llvm::ConstantInt::get(type, 0);
+        auto condition = builder.CreateICmpNE(expression, zero);
+
+        builder.CreateCondBr(condition, body.mainBlock, body.afterBlock);
+    }
+    else
+    {
+        throw NotImplementedException();
+    }
+
+    builder.SetInsertPoint(body.afterBlock);
 }
 
 llvm::Value *Visitor::visitExpression(FooParser::ExpressionContext *context)
@@ -141,8 +222,7 @@ llvm::Value *Visitor::visitUnaryNegativeExpression(FooParser::UnaryNegativeExpre
 llvm::Value *Visitor::visitNameExpression(FooParser::NameExpressionContext *context)
 {
     auto name = context->VariableName()->getText();
-
-    auto variable = this->currentScope().getVariable(name);
+    auto variable = this->getVariable(name);
 
     if (!variable)
     {
@@ -193,7 +273,7 @@ llvm::Value *Visitor::visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOper
 llvm::Value *Visitor::visitVariableAffectation(FooParser::VariableAffectationContext *context)
 {
     auto name = context->VariableName()->toString();
-    auto variable = this->currentScope().getVariable(name);
+    auto variable = this->getVariable(name);
 
     if (!variable)
     {
