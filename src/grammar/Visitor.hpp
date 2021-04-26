@@ -40,19 +40,21 @@ public:
         auto tokens = new CommonTokenStream(lexer);
         auto parser = new FooParser(tokens);
 
-        auto functionType = llvm::FunctionType::get(llvm::Type::getInt32Ty(*this->llvm_context), {}, false);
-        auto function = llvm::Function::Create(functionType, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "main", this->llvm_module.get());
-        auto block = llvm::BasicBlock::Create(*this->llvm_context);
+        auto functionReturnType = llvm::Type::getInt32Ty(builder.getContext());
+        auto functionType = llvm::FunctionType::get(functionReturnType, {}, false);
+        auto functionLinkage = llvm::GlobalValue::LinkageTypes::ExternalLinkage;
 
-        block->insertInto(function);
+        auto function = llvm::Function::Create(functionType, functionLinkage, "main", *this->llvm_module);
+
+        auto block = llvm::BasicBlock::Create(builder.getContext(), "entry", function);
         this->builder.SetInsertPoint(block);
 
         auto alloca = this->visitDeclaration(parser->declaration());
-        auto load = builder.CreateLoad(alloca->getType()->getPointerElementType(), alloca);
 
+        auto load = builder.CreateLoad(alloca->getType()->getPointerElementType(), alloca);
         Helpers::printf(llvm_module, builder, "%d\n", {load});
 
-        this->builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*this->llvm_context), 0, true));
+        this->builder.CreateRet(llvm::ConstantInt::get(functionReturnType, 0, true));
     }
 
     llvm::AllocaInst *visitDeclaration(FooParser::DeclarationContext *context)
@@ -61,8 +63,8 @@ public:
         auto value = this->visitExpression(context->expression());
         auto type = value->getType();
 
-        auto alloca = builder.CreateAlloca(type, nullptr, name);
-        builder.CreateStore(value, alloca);
+        auto alloca = this->builder.CreateAlloca(type, nullptr, name);
+        this->builder.CreateStore(value, alloca);
 
         variables[name] = alloca;
 
@@ -92,7 +94,7 @@ public:
         auto left = this->visitExpression(context->expression(0));
         auto right = this->visitExpression(context->expression(1));
 
-        return builder.CreateMul(left, right);
+        return this->builder.CreateMul(left, right);
     }
 
     llvm::Value *visitAdditionExpressionContext(FooParser::AdditionExpressionContext *context)
@@ -100,7 +102,7 @@ public:
         auto left = this->visitExpression(context->expression(0));
         auto right = this->visitExpression(context->expression(1));
 
-        return builder.CreateAdd(left, right);
+        return this->builder.CreateAdd(left, right);
     }
 
     llvm::Value *visitNumberLiteralExpression(FooParser::NumberLiteralExpressionContext *context)
@@ -108,7 +110,7 @@ public:
         auto str = context->getText();
         auto value = std::stol(str);
 
-        auto type = llvm::Type::getInt64Ty(*this->llvm_context);
+        auto type = llvm::Type::getInt64Ty(this->builder.getContext());
 
         return llvm::ConstantInt::get(type, value, true);
     }
