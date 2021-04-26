@@ -7,7 +7,7 @@
 
 int run(const FooLang::CLIManager &cli, FooLang::Visitor &visitor)
 {
-    auto jit = FooLang::JIT::create(visitor.module, visitor.llvm_context);
+    auto jit = FooLang::JIT::create(visitor.llvm_module, visitor.llvm_context);
 
     auto entry = jit->lookup<int()>("main");
     if (!entry)
@@ -22,7 +22,7 @@ int run(const FooLang::CLIManager &cli, FooLang::Visitor &visitor)
 int compile(const FooLang::CLIManager &cli, FooLang::Visitor &visitor)
 {
     std::string error;
-    FooLang::ObjectEmitter::emit(visitor.module, cli.getOptionValue("-o", "output.o"), error);
+    FooLang::ObjectEmitter::emit(visitor.llvm_module, cli.getOptionValue("-o", "output.o"), error);
 
     if (!error.empty())
     {
@@ -49,12 +49,12 @@ int main(int argc, char **argv)
     llvm::InitializeAllAsmParsers();
     llvm::InitializeAllAsmPrinters();
 
-    FooLang::Visitor visitor;
-    visitor.fromFile(argv[1]);
+    FooLang::Visitor visitor(argv[1]);
+    visitor.start();
 
     if (cli.hasOption("--print-llvm"))
     {
-        visitor.module->print(llvm::outs(), nullptr);
+        visitor.llvm_module->print(llvm::outs(), nullptr);
         std::cout << std::endl;
     }
 
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        run(cli, visitor);
+        return run(cli, visitor);
     }
 
     return 0;

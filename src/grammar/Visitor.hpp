@@ -1,12 +1,17 @@
 #pragma once
 
+#include "exceptions/NotImplementedException.hpp"
 #include "runtime/FooLexer.h"
 #include "runtime/FooParserBaseVisitor.h"
+
+#include "../logic/Helper.hpp"
 
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/Support/raw_ostream.h>
 #include <logic/Scope.hpp>
 #include <vector>
+
+using namespace antlr4;
 
 namespace FooLang
 {
@@ -14,62 +19,98 @@ class Visitor
 {
 public:
     std::unique_ptr<llvm::LLVMContext> llvm_context;
+    std::unique_ptr<llvm::Module> llvm_module;
     llvm::IRBuilder<> builder;
-    std::unique_ptr<llvm::Module> module;
-    std::vector<Scope> scopes;
+    std::string path;
 
-    Visitor() : llvm_context(std::make_unique<llvm::LLVMContext>()),
-                builder(*this->llvm_context),
-                module(std::make_unique<llvm::Module>("output", *this->llvm_context)) {}
+    std::map<std::string, llvm::Value *> variables;
 
-    Scope &currentScope();
+    Visitor(const std::string &path) : llvm_context(std::make_unique<llvm::LLVMContext>()),
+                                       llvm_module(std::make_unique<llvm::Module>(path, *this->llvm_context)),
+                                       builder(*this->llvm_context),
+                                       path(path) {}
 
-    llvm::Value *getVariable(const std::string &name);
-
-    void fromFile(const std::string &path);
-
-    llvm::Function *printfPrototype();
-
-    void visitInstructions(FooParser::InstructionsContext *context);
-
-    struct Body
+    void start()
     {
-        llvm::BasicBlock *mainBlock = nullptr;
-        llvm::BasicBlock *afterBlock = nullptr;
-    };
+        std::ifstream stream;
+        stream.open(this->path);
 
-    Body visitBody(FooParser::BodyContext *context, llvm::BasicBlock *afterBlock = nullptr);
+        auto input = new ANTLRInputStream(stream);
+        auto lexer = new FooLexer(input);
+        auto tokens = new CommonTokenStream(lexer);
+        auto parser = new FooParser(tokens);
 
-    void visitStatements(const std::vector<FooParser::StatementContext *> &statementContexts);
+        auto functionType = llvm::FunctionType::get(llvm::Type::getInt32Ty(*this->llvm_context), {}, false);
+        auto function = llvm::Function::Create(functionType, llvm::GlobalValue::LinkageTypes::ExternalLinkage, "main", this->llvm_module.get());
+        auto block = llvm::BasicBlock::Create(*this->llvm_context);
 
-    void visitStatement(FooParser::StatementContext *context);
+        block->insertInto(function);
+        this->builder.SetInsertPoint(block);
 
-    void visitVariableDeclaration(FooParser::VariableDeclarationContext *context);
+        auto alloca = this->visitDeclaration(parser->declaration());
+        auto load = builder.CreateLoad(alloca->getType()->getPointerElementType(), alloca);
 
-    void visitIfStatement(FooParser::IfStatementContext *context);
+        Helpers::printf(llvm_module, builder, "%d\n", {load});
 
-    void visitWhileStatement(FooParser::WhileStatementContext *context);
+        this->builder.CreateRet(llvm::ConstantInt::get(llvm::Type::getInt32Ty(*this->llvm_context), 0, true));
+    }
 
-    void visitPrintStatement(FooParser::PrintStatementContext *context);
+    llvm::AllocaInst *visitDeclaration(FooParser::DeclarationContext *context)
+    {
+        auto name = context->Name()->getText();
+        auto value = this->visitExpression(context->expression());
+        auto type = value->getType();
 
-    llvm::Value *visitExpression(FooParser::ExpressionContext *context);
+        auto alloca = builder.CreateAlloca(type, nullptr, name);
+        builder.CreateStore(value, alloca);
 
-    llvm::Value *visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *context);
+        variables[name] = alloca;
 
-    llvm::Value *visitNameExpression(FooParser::NameExpressionContext *context);
+        return alloca;
+    }
 
-    llvm::Value *visitBinaryOperation(FooParser::BinaryOperationContext *context);
+    llvm::Value *visitExpression(FooParser::ExpressionContext *context)
+    {
+        if (auto multiplicationExpressionContext = dynamic_cast<FooParser::MultiplicationExpressionContext *>(context))
+        {
+            return this->visitMultiplicationExpressionContext(multiplicationExpressionContext);
+        }
+        else if (auto additionExpressionContext = dynamic_cast<FooParser::AdditionExpressionContext *>(context))
+        {
+            return this->visitAdditionExpressionContext(additionExpressionContext);
+        }
+        else if (auto numberLiteralExpressionContext = dynamic_cast<FooParser::NumberLiteralExpressionContext *>(context))
+        {
+            return this->visitNumberLiteralExpression(numberLiteralExpressionContext);
+        }
 
-    llvm::Value *visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context);
+        throw NotImplementedException();
+    }
 
-    llvm::Value *visitBinaryConditionalOperation(FooParser::BinaryConditionalOperationContext *context);
+    llvm::Value *visitMultiplicationExpressionContext(FooParser::MultiplicationExpressionContext *context)
+    {
+        auto left = this->visitExpression(context->expression(0));
+        auto right = this->visitExpression(context->expression(1));
 
-    llvm::Value *visitVariableAffectation(FooParser::VariableAffectationContext *context);
+        return builder.CreateMul(left, right);
+    }
 
-    llvm::Value *visitLiteral(FooParser::LiteralContext *context);
+    llvm::Value *visitAdditionExpressionContext(FooParser::AdditionExpressionContext *context)
+    {
+        auto left = this->visitExpression(context->expression(0));
+        auto right = this->visitExpression(context->expression(1));
 
-    llvm::Value *visitIntegerLiteral(FooParser::IntegerLiteralContext *context);
+        return builder.CreateAdd(left, right);
+    }
 
-    llvm::Type *visitType(FooParser::TypeContext *context);
+    llvm::Value *visitNumberLiteralExpression(FooParser::NumberLiteralExpressionContext *context)
+    {
+        auto str = context->getText();
+        auto value = std::stol(str);
+
+        auto type = llvm::Type::getInt64Ty(*this->llvm_context);
+
+        return llvm::ConstantInt::get(type, value, true);
+    }
 };
 } // namespace FooLang

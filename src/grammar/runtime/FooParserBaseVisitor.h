@@ -15,79 +15,19 @@
 class  FooParserBaseVisitor : public FooParserVisitor {
 public:
 
-  virtual antlrcpp::Any visitInstructions(FooParser::InstructionsContext *ctx) override {
+  virtual antlrcpp::Any visitDeclaration(FooParser::DeclarationContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitBody(FooParser::BodyContext *ctx) override {
+  virtual antlrcpp::Any visitNumberLiteralExpression(FooParser::NumberLiteralExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitStatement(FooParser::StatementContext *ctx) override {
+  virtual antlrcpp::Any visitAdditionExpression(FooParser::AdditionExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitInParenExpression(FooParser::InParenExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitBinaryOperation(FooParser::BinaryOperationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitNameExpression(FooParser::NameExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitLiteralExpression(FooParser::LiteralExpressionContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitBinaryConditionalOperation(FooParser::BinaryConditionalOperationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitVariableAffectation(FooParser::VariableAffectationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitLiteral(FooParser::LiteralContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitIntegerLiteral(FooParser::IntegerLiteralContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitVariableDeclaration(FooParser::VariableDeclarationContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitPrintStatement(FooParser::PrintStatementContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitType(FooParser::TypeContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitIfStatement(FooParser::IfStatementContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitWhileStatement(FooParser::WhileStatementContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual antlrcpp::Any visitEos(FooParser::EosContext *ctx) override {
+  virtual antlrcpp::Any visitMultiplicationExpression(FooParser::MultiplicationExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 

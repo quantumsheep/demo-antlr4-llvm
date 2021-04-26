@@ -12,13 +12,8 @@
 class  FooLexer : public antlr4::Lexer {
 public:
   enum {
-    Add = 1, Sub = 2, Mul = 3, Div = 4, Mod = 5, Gt = 6, Gte = 7, Lt = 8, 
-    Lte = 9, Eq = 10, Ne = 11, Equal = 12, OpeningParen = 13, ClosingParen = 14, 
-    OpeningBrace = 15, ClosingBrace = 16, OpeningBracket = 17, ClosingBracket = 18, 
-    VariableDeclarator = 19, Print = 20, If = 21, While = 22, Comma = 23, 
-    InstructionsSeparator = 24, VariableName = 25, StringLiteral = 26, CharLiteral = 27, 
-    DecimalLiteral = 28, ZeroLiteral = 29, HexadecimalLiteral = 30, BinaryLiteral = 31, 
-    Comment = 32, WhiteSpace = 33, LineTerminator = 34
+    Let = 1, Add = 2, Mul = 3, Equal = 4, Name = 5, Number = 6, WhiteSpace = 7, 
+    LineTerminator = 8
   };
 
   explicit FooLexer(antlr4::CharStream *input);

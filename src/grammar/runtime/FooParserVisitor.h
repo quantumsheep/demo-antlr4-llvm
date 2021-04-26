@@ -19,43 +19,13 @@ public:
   /**
    * Visit parse trees produced by FooParser.
    */
-    virtual antlrcpp::Any visitInstructions(FooParser::InstructionsContext *context) = 0;
+    virtual antlrcpp::Any visitDeclaration(FooParser::DeclarationContext *context) = 0;
 
-    virtual antlrcpp::Any visitBody(FooParser::BodyContext *context) = 0;
+    virtual antlrcpp::Any visitNumberLiteralExpression(FooParser::NumberLiteralExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitStatement(FooParser::StatementContext *context) = 0;
+    virtual antlrcpp::Any visitAdditionExpression(FooParser::AdditionExpressionContext *context) = 0;
 
-    virtual antlrcpp::Any visitUnaryNegativeExpression(FooParser::UnaryNegativeExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitInParenExpression(FooParser::InParenExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitBinaryOperation(FooParser::BinaryOperationContext *context) = 0;
-
-    virtual antlrcpp::Any visitNameExpression(FooParser::NameExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitLiteralExpression(FooParser::LiteralExpressionContext *context) = 0;
-
-    virtual antlrcpp::Any visitBinaryMultiplyOperation(FooParser::BinaryMultiplyOperationContext *context) = 0;
-
-    virtual antlrcpp::Any visitBinaryConditionalOperation(FooParser::BinaryConditionalOperationContext *context) = 0;
-
-    virtual antlrcpp::Any visitVariableAffectation(FooParser::VariableAffectationContext *context) = 0;
-
-    virtual antlrcpp::Any visitLiteral(FooParser::LiteralContext *context) = 0;
-
-    virtual antlrcpp::Any visitIntegerLiteral(FooParser::IntegerLiteralContext *context) = 0;
-
-    virtual antlrcpp::Any visitVariableDeclaration(FooParser::VariableDeclarationContext *context) = 0;
-
-    virtual antlrcpp::Any visitPrintStatement(FooParser::PrintStatementContext *context) = 0;
-
-    virtual antlrcpp::Any visitType(FooParser::TypeContext *context) = 0;
-
-    virtual antlrcpp::Any visitIfStatement(FooParser::IfStatementContext *context) = 0;
-
-    virtual antlrcpp::Any visitWhileStatement(FooParser::WhileStatementContext *context) = 0;
-
-    virtual antlrcpp::Any visitEos(FooParser::EosContext *context) = 0;
+    virtual antlrcpp::Any visitMultiplicationExpression(FooParser::MultiplicationExpressionContext *context) = 0;
 
 
 };
