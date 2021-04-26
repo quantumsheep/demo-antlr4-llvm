@@ -167,10 +167,14 @@ void Visitor::visitIfStatement(FooParser::IfStatementContext *context)
 
     auto body = this->visitBody(context->body());
 
-    if (type->isIntegerTy())
-    {
-        builder.SetInsertPoint(previousBlock);
+    builder.SetInsertPoint(previousBlock);
 
+    if (type->isIntegerTy(1))
+    {
+        builder.CreateCondBr(expression, body.mainBlock, body.afterBlock);
+    }
+    else if (type->isIntegerTy())
+    {
         auto zero = llvm::ConstantInt::get(type, 0);
         auto condition = builder.CreateICmpNE(expression, zero);
 
@@ -199,10 +203,14 @@ void Visitor::visitWhileStatement(FooParser::WhileStatementContext *context)
 
     auto afterBlock = llvm::BasicBlock::Create(builder.getContext());
 
-    if (type->isIntegerTy())
-    {
-        builder.SetInsertPoint(conditionBlock);
+    builder.SetInsertPoint(conditionBlock);
 
+    if (type->isIntegerTy(1))
+    {
+        builder.CreateCondBr(expression, body.mainBlock, afterBlock);
+    }
+    else if (type->isIntegerTy())
+    {
         auto zero = llvm::ConstantInt::get(type, 0);
         auto condition = builder.CreateICmpNE(expression, zero);
 
