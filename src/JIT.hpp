@@ -15,6 +15,14 @@ private:
 
 public:
     JIT(std::unique_ptr<llvm::orc::LLJIT> _lljit) : lljit(std::move(_lljit)) {}
+    
+    void registerSymbols(
+        llvm::function_ref<llvm::orc::SymbolMap(llvm::orc::MangleAndInterner)> symbolMap) {
+        auto &mainJitDylib = this->lljit->getMainJITDylib();
+        llvm::cantFail(mainJitDylib.define(
+            absoluteSymbols(symbolMap(llvm::orc::MangleAndInterner(
+                mainJitDylib.getExecutionSession(), this->lljit->getDataLayout())))));
+    }
 
     template <typename T, typename = std::enable_if_t<std::is_pointer<T>::value && std::is_function<std::remove_pointer_t<T>>::value>>
     llvm::Expected<T> lookup(const std::string &name)
