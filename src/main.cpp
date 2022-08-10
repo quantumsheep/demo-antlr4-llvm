@@ -8,6 +8,14 @@
 int run(const FooLang::CLIManager &cli, FooLang::Visitor &visitor)
 {
     auto jit = FooLang::JIT::create(visitor.module, visitor.llvm_context);
+    
+    jit->registerSymbols(
+        [&](llvm::orc::MangleAndInterner interner) {
+            llvm::orc::SymbolMap symbolMap;
+            // Add symbols here
+            symbolMap[interner("printf")] = llvm::JITEvaluatedSymbol::fromPointer(printf);
+            return symbolMap;
+        });
 
     auto entry = jit->lookup<int()>("main");
     if (!entry)
